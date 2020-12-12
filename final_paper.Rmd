@@ -20,6 +20,7 @@ library(foreign)
 library(readxl)
 library(stargazer)
 library(ggrepel)
+library(readr)
 ```
 
 # Introduction
@@ -55,7 +56,7 @@ A brief demonstration of the R codes used for the data collection is as follows.
 
 ### State-level collectivism
 
-The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons, we winsorized it to 3 standard deviation above the mean.
+The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons, we winsorized it to 3 standard deviations above the mean.
 
 ### Covariates
 
@@ -101,7 +102,7 @@ for day in dates:
     #See code chunk under sentiment analysis
 ```
 
-The corresponding codes for the geo-mapping procedure of the general tweets are illustrated below:
+The corresponding R codes for the geo-mapping procedure of the general tweets are illustrated below. Note that we did an additional cleaning process for the general tweets. Our data collection period overlapped with another extremely emotion-laden events in the U.S., which is the presidential election. Therefore, we dropped tweets containing words related broadly to politics, the election, and the candidates in order to prevent any emotional bias due to the election from contaminating our baseline sentiment estimates. Towards this end, we dropped tweets containing keywords such as :????? 
 
 ```{r}
 #R code for geo-mapping
@@ -110,7 +111,7 @@ The corresponding codes for the geo-mapping procedure of the general tweets are 
 ## Sentiment analysis
 
 We performed sentiment analysis with two widely-used models: VADER and NRC Word-Emotion Association Lexicon. VADER stands for Valence Aware Dictionary and Sentiment Reasoner, and it is a lexicon and rule-based model that quantifies a given text in terms of its positivity or negativity. We adopted three scores output by VADER for each tweet: Compound score, which is the general sentiment that varies from -1 (most negative) to +1 (most positive); Positivity score, which is the ratio of positive words to the whole text, thus varies from 0 to 1; and Negativity score, which is the ratio of negative words to the whole text, thus varies from 0 to 1 as well.  
-NRC Word-Emotion Association Lexicon (called NRC hereafter) is also a lexicon-based model that quantifies the emotion assoicated with a given text. The NRC include a list of words and the eight emotion categories they belong to: anger, fear, anticipation, trust, surprise, sadness, joy, and disgust (note that NRC also links words to the two sentiments, positive and negative, but we did not use them since those were already quantified in VADER). Therefore, for a given text, NRC outputs the ratio of words belonging to each emotion category to the whole text. We adopted these eight ratio scores of each tweet in the present study to examine the more specific emotions of the tweets as a funciton of collectivism.  
+NRC Word-Emotion Association Lexicon (called NRC hereafter) is also a lexicon-based model that quantifies the emotion assoicated with a given text. The NRC include a list of words and the eight emotion categories they belong to: anger, fear, anticipation, trust, surprise, sadness, joy, and disgust (note that NRC also links words to the two sentiments, positive and negative, but we did not use them since those were already quantified in VADER). Therefore, for a given text, NRC outputs the number of words belonging to each emotion category. We adopted these eight scores of each tweet in the present study to examine the more specific emotions of the tweets as a funciton of collectivism.  
 The python codes used to calculate the sentiment/emotion of the covid-related tweets are listed below:
 
 ```{python, eval = FALSE, python.reticulate = FALSE}
@@ -169,15 +170,19 @@ The corresponding R codes for the general tweets are presented below:
 We used multiple regression analysis to predict the sentiment of each state using the state-level collectivism, after controlling for the relevant covariates. We first analyzed sentiment based on VADER. We aggregated the score (compound score, as well as the positivity and negativity score) of all the covid-related tweets of each state across the days of the data collection period. We repeated the same procedure for the general tweets. Hence, we obtained one compound score, one positivity score, and one negativity score for each state on covid-related tweets, and likewise on general tweets. We first fit a base model, using only collectivism to predict the sentiment scores. We next fit a model including all the covariates. All the predictors were z scored. Each regression was weighted by the number of tweets collected for each state, since greater number provides a more reliable estimate of the sentiment. The R codes for VADER analysis are included below:  
 
 ```{r read_RDS, echo = F, warning=F, message=F}
-general_t <- readRDS('COVID_WaveIII_s9_stccount.rds')
+general_url <- "https://github.com/QinggangYu/SURVMETH727_final_project/raw/main/COVID_WaveIII_s9_stccount.rds"
+download.file(general_url, "general_t.rds")
+general_t <- readRDS('general_t.rds')
 ```
 
-```{r covid_keyword_tweet, echo = F, warning=F, message=F, results='asis'}
+```{r VADER_processing, warning=F, message=F, results='asis'}
 ##COVID TWEETS
-setwd('/Users/Qinggang1/Documents/graduate/Survmeth727/Final_project/')
-cov <- read_excel('Predictors_US_states.xlsx')
-covid_t <- read_csv('vader_sentiment.csv')
-case_death <- read_csv('covid_21day_covariates.csv')
+cov_url <- "https://raw.githubusercontent.com/QinggangYu/SURVMETH727_final_project/main/Predictors_US_states.csv"
+cov <- read_csv(url(cov_url))
+covid_t_url <- "https://raw.githubusercontent.com/QinggangYu/SURVMETH727_final_project/main/vader_sentiment.csv"
+covid_t <- read_csv(url(covid_t_url))
+cd_url <- "https://raw.githubusercontent.com/QinggangYu/SURVMETH727_final_project/main/covid_21day_covariates.csv"
+case_death <- read_csv(url(cd_url))
 
 covid_t_agg <- covid_t %>% 
   group_by(state) %>% 
@@ -201,7 +206,8 @@ full_data[full_data$State == "Hawaii", "Collectivism"] <- 3
 b_model_w <- lm(compound ~ Collectivism, weights = count, data = full_data)
 
 #with covariates (with weight)
-cov_model_w <- lm(compound ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+cov_model_w <- lm(compound ~ Collectivism + Population + Income + Median_age + 
+                    Conservatism + case_sum + death_sum, 
                   weights = count, data = full_data)
 
 #Pos SCORE
@@ -210,7 +216,8 @@ cov_model_w <- lm(compound ~ Collectivism + Population + Income + Median_age + C
 b_modelpos_w <- lm(pos ~ Collectivism, weights = count, data = full_data)
 
 #with covariates (with weight)
-cov_modelpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+cov_modelpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + 
+                       Conservatism + case_sum + death_sum, 
                      weights = count, data = full_data)
 
 #Neg SCORE
@@ -219,7 +226,8 @@ cov_modelpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Con
 b_modelneg_w <- lm(neg ~ Collectivism, weights = count, data = full_data)
 
 #with covariates (with weight)
-cov_modelneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum,
+cov_modelneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + 
+                       Conservatism + case_sum + death_sum,
                      weights = count, data = full_data)
 
 ##GENERAL TWEETS
@@ -252,7 +260,8 @@ full_data_gen[, c(3:22, 24, 25)] <- lapply(full_data_gen[, c(3:22, 24, 25)], sca
 b_gen_w <- lm(compound ~ Collectivism, weights = count, data = full_data_gen)
 
 #with covariates (with weight)
-cov_gen_w <- lm(compound ~ Collectivism + Population + Income + Median_age  + Conservatism + case_sum + death_sum, 
+cov_gen_w <- lm(compound ~ Collectivism + Population + Income + Median_age+ 
+                  Conservatism + case_sum + death_sum, 
                   weights = count, data = full_data_gen)
 
 ##Pos SCORE
@@ -261,7 +270,8 @@ cov_gen_w <- lm(compound ~ Collectivism + Population + Income + Median_age  + Co
 b_genpos_w <- lm(pos ~ Collectivism, weights = count, data = full_data_gen)
 
 #with covariates (with weight)
-cov_genpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+cov_genpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + 
+                     Conservatism + case_sum + death_sum, 
                      weights = count, data = full_data_gen)
 
 ##Neg SCORE
@@ -270,15 +280,17 @@ cov_genpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Conse
 b_genneg_w <- lm(neg ~ Collectivism, weights = count, data = full_data_gen)
 
 #with covariates (with weight)
-cov_genneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+cov_genneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + 
+                     Conservatism + case_sum + death_sum, 
                      weights = count, data = full_data_gen)
 ```
 
-We performed the same set of analyses for sentiment scores from NRC. Because there are eight specific emotions, and we did not have a priori predictions on which emotions were likely involved, we treated our analyses as exploratory. We fit the base model and the model with covariates on each emotion score, for both the covid-related tweets and general tweets. Because there are eight emotion categories, we corrected for multiple correction using the Bonferroni method, and set the threshold of significance to *p* < 0.0625 (0.5/8). The R codes for NRC analysis are included below:
+We performed the same set of analyses for sentiment scores from NRC. Because there are eight specific emotions, and we did not have a priori predictions on which emotions were likely involved, we treated our analyses as exploratory. We fit the base model and the model with covariates on each emotion score, for both the covid-related tweets and general tweets. In addition to the covariates we included in VADER analysis, we also controlled for the averaged number of sentences in the NRC analysis. This is because NRC produced raw count of occurrence of the words belonging to each emotion category, thus longer text will have a higher number of the count. Because there are eight emotion categories, we corrected for multiple correction using the Bonferroni method, and set the threshold of significance to *p* < 0.00625 (0.5/8). The R codes for NRC analysis are included below:
 
-```{r covid_keyword_tweet, echo = F, warning=F, message=F}
+```{r NRC_processing, warning=F, message=F}
 
-covid_t <- read_csv('NRC_raw.csv')
+NRC_url <- "https://raw.githubusercontent.com/QinggangYu/SURVMETH727_final_project/main/NRC_raw.csv"
+covid_t <- read_csv(url(NRC_url))
 
 covid_t_agg <- covid_t %>% 
   group_by(state) %>% 
@@ -287,15 +299,16 @@ covid_t_agg <- covid_t %>%
 comb_data <- covid_t_agg %>% 
   left_join(case_death, by = "state")
 
-full_data <- cov %>% 
+full_data_NRC <- cov %>% 
   left_join(comb_data, by = c("State" = "state"))
-full_data[, c(3:29, 31:34)] <- lapply(full_data[, c(3:29, 31:34)], scale)
+full_data_NRC[, c(3:29, 31:34)] <- lapply(full_data_NRC[, c(3:29, 31:34)], scale)
 
 #iterated fitting
-varlist <- names(full_data)[c(20:24, 27:29)]
+varlist <- names(full_data_NRC)[c(20:24, 27:29)]
 models <- lapply(varlist, function(x){
-  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + num_sentence + case_sum + death_sum, list(i = as.name(x))), 
-     weights = count, data = full_data)
+  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + 
+                  num_sentence + case_sum + death_sum, list(i = as.name(x))), 
+     weights = count, data = full_data_NRC)
 })
 
 general_t_agg <- general_t %>%
@@ -314,48 +327,139 @@ general_t_data <- left_join(general_t_agg, general_t_count, by = "state")
 comb_data_gen <- general_t_data %>% 
   left_join(case_death, by = "state")
 
-full_data_gen <- cov %>% 
+full_data_genNRC <- cov %>% 
   left_join(comb_data_gen, by = c("State" = "state"))
 
-full_data_gen[, c(3:28, 30:31)] <- lapply(full_data_gen[, c(3:28, 30:31)], scale)
+full_data_genNRC[, c(3:28, 30:31)] <- lapply(full_data_genNRC[, c(3:28, 30:31)], scale)
 
-models <- lapply(varlist, function(x){
-  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + sentence_count_1 + case_sum + death_sum, 
-                list(i = as.name(x))), weights = count, data = full_data_gen)
+models_gen <- lapply(varlist, function(x){
+  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + 
+                  sentence_count_1 + case_sum + death_sum, 
+                list(i = as.name(x))), weights = count, data = full_data_genNRC)
 })
 ```
 
 # Results
 
-This section presents the main results.
+## VADER analysis
 
-## Data exploration
+We found that when more collectivist states tweeted about COVID-19, the sentiment of the tweets tended to be more positive (Fig. 1). This was evident in both the base model (*b* = `r b_model_w$coefficients[2]`, *p* = `r summary(b_model_w)$coefficients[2,4]`), as well as after controlling for the covariates (*b* = `r cov_model_w$coefficients[2]`, *p* = `r summary(cov_model_w)$coefficients[2,4]`). The positivity of the sentiment likely arose from their tweets containing more positive words, although this was only statisitically significant in the base model (*b* = `r b_modelpos_w$coefficients[2]`, *p* = `r summary(b_modelpos_w)$coefficients[2,4]`). Collectivism did not have any effects on the negativity score of the covid-related tweets, either in the base model or after controlling the covariates , *p*s > .05. These effects are summarized in Table 1.
 
-The results section may have a data exploration part, but in general the structure here depends on the specific project.
-
-```{r}
-# What happens here depends on the specific project
+```{r Table1, echo=FALSE, warning=F, message=F, results='asis'}
+stargazer(b_model_w, cov_model_w, b_modelpos_w, cov_modelpos_w, b_modelneg_w, cov_modelneg_w,
+          title = "Vader Sentiment on Covid-related tweets", dep.var.labels = c("Compound Score", "Positivity Score", "Negativity Score"),
+          covariate.labels = c("Collectivism", "Population", "Income", "Median age", "Conservatism", "case number", "death number"),
+          column.sep.width = "1pt",
+          omit.stat = c("ll", "aic", "bic", "f", "ser"))
 ```
 
-```{r}
-# What happens here depends on the specific project
+```{r echo = F, warning=F, message=F}
+plot_m <- lm(compound ~ Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data)
+
+plot_m2 <- lm(Collectivism ~ Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data)
+
+full_data$Compound_adjusted <- plot_m$residuals
+full_data$Collectivism_adjusted <- plot_m2$residuals
+
+ggplot(data = full_data, mapping = aes(x = Collectivism_adjusted, y = Compound_adjusted)) + 
+  geom_point(aes(size = count)) + 
+  geom_smooth(method = "lm") +
+  geom_text_repel(aes(label = State),
+                  label.padding = 0.25,
+                  size = 2.5,
+                  segment.size = 0.15,
+                  segment.alpha = 1) +
+  labs(x = "Adjusted Collectivism", y = "Adjusted Compound Score", size = "Number of tweets per day", 
+       title = "Fig. 1. Collectivism predicts more positive sentiment in Covid-related tweets") +
+  theme(legend.title = element_text(size = 8))
 ```
 
-## Analysis
+We observed a very different picture for the general tweets. In particular, the sentiment of the general tweets from more collectivist states are more negative (Fig. 2). This was evident in both the base model (*b* = `r b_gen_w$coefficients[2]`, *p* = `r summary(b_gen_w)$coefficients[2,4]`), as well as after controlling for the covariates (*b* = `r cov_gen_w$coefficients[2]`, *p* = `r summary(cov_gen_w)$coefficients[2,4]`). This negative sentiment was driven by tweets in collectivist states containing more negative words (*b* = `r cov_genneg_w$coefficients[2]`, *p* = `r summary(cov_genneg_w)$coefficients[2,4]`), as well as less positive words (*b* = `r cov_genpos_w$coefficients[2]`, *p* = `r summary(cov_genpos_w)$coefficients[2,4]`). This result was consistent before or after controlling the covariates (stats above depicting models including the covariates. These effects are summarized in Table 2.
 
-This section presents the main results, such as (for example) stats and graphs that show relationships, model results and/or clustering, PCA, etc.
-
-```{r}
-# What happens here depends on the specific project
+```{r Table2, echo=FALSE, warning=F, message=F, results='asis'}
+stargazer(b_gen_w, cov_gen_w, b_genpos_w, cov_genpos_w, b_genneg_w, cov_genneg_w,
+          title = "Vader Sentiment on General tweets", dep.var.labels = c("Compound Score", "Positivity Score", "Negativity Score"),
+          covariate.labels = c("Collectivism", "Population", "Income", "Median age", "Conservatism", "case number", "death number"),
+          column.sep.width = "1pt",
+          omit.stat = c("ll", "aic", "bic", "f", "ser"))
 ```
 
-```{r}
-# What happens here depends on the specific project
+```{r echo = F, warning=F, message=F}
+plot_m <- lm(compound ~ Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data_gen)
+
+plot_m2 <- lm(Collectivism ~ Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data_gen)
+
+full_data_gen$Compound_adjusted <- plot_m$residuals
+full_data_gen$Collectivism_adjusted <- plot_m2$residuals
+
+ggplot(data = full_data_gen, mapping = aes(x = Collectivism_adjusted, y = Compound_adjusted)) + 
+  geom_point(aes(size = count)) + 
+  geom_smooth(method = "lm") +
+  geom_text_repel(aes(label = State),
+                  label.padding = 0.25,
+                  size = 2.5,
+                  segment.size = 0.15,
+                  segment.alpha = 1) +
+  labs(x = "Adjusted Collectivism", y = "Adjusted Compound Score", size = "Number of tweets per day", 
+       title = "Fig. 2. Collectivism predicts more negative sentiment in general tweets") +
+  theme(legend.title = element_text(size = 8)) + 
+  scale_size(range = c(0, 2))
 ```
 
-```{r}
-# What happens here depends on the specific project
+## NRC analysis
+
+The results for the effect of collectivism on specific emotions in covid-related tweets are illustrated in Fig. 3 (note that we plotted the 95% confidence interval of the estimate, hence the uncorrected estimate). Although there seems to be a few notable effects, only the effect on fear and trust survived the correction for multiple-comparison. Covid-related Tweets in more collectivist states tended to contain less sentiment of fear and trust.
+
+```{r echo = F, warning=F, message=F}
+coef_table <- data.frame(matrix(ncol = 3, nrow = 0))
+
+for (i in 1:length(models)){
+  m <- models[[i]]
+  conf_int <- confint(m, "Collectivism")
+  row <- c(m$coefficients[2], conf_int[1], conf_int[2])
+  coef_table <- rbind(coef_table, row)
+}
+names(coef_table) = c("Coefficient", "lower", "upper")
+
+coef_table$emotion <- varlist
+
+ggplot(data = coef_table) +
+  geom_linerange(aes(xmin = lower, xmax = upper, y = emotion, color = emotion)) + 
+  geom_point(aes(x = Coefficient, y = emotion)) + 
+  geom_vline(aes(xintercept = 0)) +
+  labs(x = "Effect of Collectivism", y = "Emotion",
+       title = "Fig. 3. Effect of collectivism on different emotions of covid-related tweets") +
+  theme(legend.position = "none")
 ```
+
+The results for the effect of collectivism on specific emotions in general tweets are illustrated in Fig. 3 (note that we plotted the 95% confidence interval of the estimate, hence the uncorrected estimate). Again, the effect of collectivism on a few emotions was notable in the uncorrected results. However, none of the effects survived the correction for multiple-comparison.
+
+```{r echo = F, warning=F, message=F}
+coef_table_gen <- data.frame(matrix(ncol = 3, nrow = 0))
+
+for (i in 1:length(models_gen)){
+  m <- models_gen[[i]]
+  conf_int <- confint(m, "Collectivism")
+  row <- c(m$coefficients[2], conf_int[1], conf_int[2])
+  coef_table_gen <- rbind(coef_table_gen, row)
+}
+names(coef_table_gen) = c("Coefficient", "lower", "upper")
+
+coef_table_gen$emotion <- varlist
+
+ggplot(data = coef_table_gen) +
+  geom_linerange(aes(xmin = lower, xmax = upper, y = emotion, color = emotion)) + 
+  geom_point(aes(x = Coefficient, y = emotion)) + 
+  geom_vline(aes(xintercept = 0)) +
+  labs(x = "Effect of Collectivism", y = "Emotion",
+       title = "Fig. 4. Effect of collectivism on different emotions of general tweets") +
+  theme(legend.position = "none")
+```
+
 
 # Discussion
 
