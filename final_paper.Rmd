@@ -1,0 +1,366 @@
+---
+title: "Does collectivism modulate sentiment on COVID-19 pandemic?"
+subtitle: "An examination of Twitter data in the United States"
+author: "Tong Suo & Qinggang Yu"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: yes
+    df_print: kable
+    latex_engine: xelatex
+bibliography: mybib.bib
+csl: ASA.csl
+link-citations: yes
+---
+
+```{r, include = FALSE}
+library(knitr)
+library(tidyverse)
+library(foreign)
+library(readxl)
+library(stargazer)
+library(ggrepel)
+```
+
+# Introduction
+
+
+
+# Data
+
+## Data collection
+
+### Twitter data
+
+The data of the present study were collected by live-streaming tweets during a three-week period from October 30th to November 19th. We targeted this period because it overlapped with the onset of the "third wave" of the COVID-19 pandemic in the U.S., when about ??? new cases and ??? new deaths happened. We conducted two separate lines of collection. One collection streamed tweets containing words that are related to the COVID-19 pandemic, such as "covid", "corona", and "pandemic" (see the supplementary materials for a full list of the keywords). The other collection streamed general tweets, which means we did not limit the collection to any specific keywords. Both collection streamed tweets generated from within the U.S. by applying a bounding box defined by geographical coordinates.  
+The COVID-related tweets were collected in Python using the tweepy package, which provides wrapper functions of the Twitter API. On each day, the collection starts from between 10am and 12pm and runs for 10 hours. Due to technical issues, the collection did not run properly for two days within the three-week period, so we collected an additional day of day on November 20th. A brief demonstration of the Python codes used for the data collection is as follows. The complete version of the codes is included in the supplementary materials.
+
+
+```{python, eval = FALSE, python.reticulate = FALSE}
+all_tweets = []
+box = [-178.334698, 18.910360999999998, -66.949895, 49.384358]
+#The listener, MyStreamListener, is customized to collect only COVID-related tweets
+#and append the tweets to the container
+myStream = tweepy.Stream(auth = api.auth, listener = MyStreamListener(36000), 
+                         tweet_mode = 'extended')
+myStream.filter(locations = box)
+```
+
+The general tweets were collected in R using the rtweet package. On each day, the collection starts from ...
+A brief demonstration of the R codes used for the data collection is as follows.
+
+```{r, eval = FALSE}
+# R code for collection
+```
+
+### State-level collectivism
+
+The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons, we winsorized it to 3 standard deviation above the mean.
+
+### Covariates
+
+We included a few state-level covariates in our model. Some of them are demographic, such as population, median age, median household income, and the level of conservatism. These data were retrieved from the U.S. Census Bureau. We additionally include the number of new cases and the number of new deaths of COVID-19 for each state during our three-week data collection period, as the sentiment might covary with the progression of the pandemic. The COVID-19 data were retrieved from a public database maintained by the John Hopkins website.
+
+## Data cleaning
+
+We first mapped the collected tweets to the state they were originated. This was accomplished using the reverse-geocode package in Python for the covid-related tweets. The coordinate bounding box of each tweet, embedded in the tweet json object of each corresponding tweet, was first extracted and its midpoint was identified. The package then output the state where the midpoint coordinate falls in. Along this process, we also dropped tweets originating from outside the U.S. but were incidentially collected (because of the imperfect overlap between the bounding box and the U.S. territory), and tweets in other languages than English. A brief demonstration of the Python codes used for this process (for covid-related tweets) is as follows.
+
+```{python, eval = FALSE, python.reticulate = FALSE}
+def sort_data(dates):
+    f_name = dates + '_covid.pkl'
+    infile = open(f_name, "rb")
+    curr_day = pickle.load(infile)
+    infile.close()
+    all_states = {}
+    #coords is a panda dataframe containing the name and coordinates of each state
+    for i in range(coords.shape[0]):
+        place = coords.loc[i, "NAME"]
+        all_states[place] = []
+    for twt in curr_day:
+        if hasattr(twt, "place") and hasattr(twt.place, "country_code") \
+        and hasattr(twt.place, "bounding_box"):
+            if (twt.place.country_code == "US") and (twt.lang == "en"):
+                loc_box = twt.place.bounding_box.coordinates[0]
+                loc = np.mean(loc_box, axis = 0)
+                coordinates = (loc[1], loc[0])
+                r = rg.search(coordinates)
+                place = r[0]['admin1']
+                all_states[place].append(twt)
+    outname = 'bystate_' + f_name
+    f = open(outname, "wb")
+    pickle.dump(all_states, f)
+    f.close()
+    return all_states
+    
+dates = ['1030', '1031', '1102', '1103', '1105', '1106', '1107', '1108', 
+          '1109', '1110', '1111', '1112', '1113', '1114', '1115', '1116',
+          '1117', '1118', '1119', '1120']
+for day in dates:
+    all_states = sort_data(day)
+    #further processing starts here
+    #See code chunk under sentiment analysis
+```
+
+The corresponding codes for the geo-mapping procedure of the general tweets are illustrated below:
+
+```{r}
+#R code for geo-mapping
+```
+
+## Sentiment analysis
+
+We performed sentiment analysis with two widely-used models: VADER and NRC Word-Emotion Association Lexicon. VADER stands for Valence Aware Dictionary and Sentiment Reasoner, and it is a lexicon and rule-based model that quantifies a given text in terms of its positivity or negativity. We adopted three scores output by VADER for each tweet: Compound score, which is the general sentiment that varies from -1 (most negative) to +1 (most positive); Positivity score, which is the ratio of positive words to the whole text, thus varies from 0 to 1; and Negativity score, which is the ratio of negative words to the whole text, thus varies from 0 to 1 as well.  
+NRC Word-Emotion Association Lexicon (called NRC hereafter) is also a lexicon-based model that quantifies the emotion assoicated with a given text. The NRC include a list of words and the eight emotion categories they belong to: anger, fear, anticipation, trust, surprise, sadness, joy, and disgust (note that NRC also links words to the two sentiments, positive and negative, but we did not use them since those were already quantified in VADER). Therefore, for a given text, NRC outputs the ratio of words belonging to each emotion category to the whole text. We adopted these eight ratio scores of each tweet in the present study to examine the more specific emotions of the tweets as a funciton of collectivism.  
+The python codes used to calculate the sentiment/emotion of the covid-related tweets are listed below:
+
+```{python, eval = FALSE, python.reticulate = FALSE}
+for day in dates:
+    all_states = sort_data(day)
+    #container for vader scores
+    vader_state = {}
+    for i in all_states.keys():
+        vader_state[i] = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
+    #container for NRC scores
+    NRC_state = {}
+    for i in all_states.keys():
+        NRC_state[i] = {'fear': [], 'anger': [], 'anticipation': [], \
+                       'trust': [], 'surprise': [], 'positive': [], \
+                       'negative': [], 'sadness': [], 'disgust': [], 'joy': [], \
+                       'length': [], 'sentence': []}
+    #looping through the data                   
+    for s in all_states.keys():
+        curr_states = all_states[s]
+        if len(curr_states) > 0:
+            #fetch the text of each tweet
+            for i in range(len(curr_states)):
+                tweet = curr_states[i]
+                if hasattr(tweet, "extended_tweet"):
+                    text = tweet.extended_tweet["full_text"]
+                else:
+                    text = tweet.text
+                #Vader analysis
+                broken_sent = nltk.sent_tokenize(text)
+                sent_scores = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
+                for sentence in broken_sent:
+                    vs = analyzer.polarity_scores(sentence)
+                    for k in vs.keys():
+                        sent_scores[k].append(vs[k])
+                for k in sent_scores.keys():
+                    text_score = sum(sent_scores[k])/len(sent_scores[k])
+                    vader_state[s][k].append(text_score)
+                #NRC analysis
+                text_object = NRCLex(text)
+                text_score = text_object.affect_count
+                text_length = len(text_object.words)
+                NRC_state[s]['length'].append(text_length)
+                NRC_state[s]['sentence'].append(len(text_object.sentences))
+                for k in text_score.keys():
+                    NRC_state[s][k].append(text_score[k])
+```
+
+The corresponding R codes for the general tweets are presented below:
+
+```{r}
+#R code for sentiment analysis
+```
+
+## Statistial analysis
+
+We used multiple regression analysis to predict the sentiment of each state using the state-level collectivism, after controlling for the relevant covariates. We first analyzed sentiment based on VADER. We aggregated the score (compound score, as well as the positivity and negativity score) of all the covid-related tweets of each state across the days of the data collection period. We repeated the same procedure for the general tweets. Hence, we obtained one compound score, one positivity score, and one negativity score for each state on covid-related tweets, and likewise on general tweets. We first fit a base model, using only collectivism to predict the sentiment scores. We next fit a model including all the covariates. All the predictors were z scored. Each regression was weighted by the number of tweets collected for each state, since greater number provides a more reliable estimate of the sentiment. The R codes for VADER analysis are included below:  
+
+```{r read_RDS, echo = F, warning=F, message=F}
+general_t <- readRDS('COVID_WaveIII_s9_stccount.rds')
+```
+
+```{r covid_keyword_tweet, echo = F, warning=F, message=F, results='asis'}
+##COVID TWEETS
+setwd('/Users/Qinggang1/Documents/graduate/Survmeth727/Final_project/')
+cov <- read_excel('Predictors_US_states.xlsx')
+covid_t <- read_csv('vader_sentiment.csv')
+case_death <- read_csv('covid_21day_covariates.csv')
+
+covid_t_agg <- covid_t %>% 
+  group_by(state) %>% 
+  summarise_at(vars(compound:count), mean, na.rm = TRUE)
+
+comb_data <- cov %>% 
+  left_join(covid_t_agg, by = c("State" = "state"))
+
+full_data <- comb_data %>% 
+  left_join(case_death, by = c("State" = "state"))
+
+full_data <- subset(full_data, !is.na(full_data$compound))
+
+full_data[, c(3:23, 25:26)] <- lapply(full_data[, c(3:23, 25:26)], scale)
+full_data[full_data$State == "Hawaii", "Collectivism"] <- 3
+
+
+#COMPOUND SCORE
+
+#base model(With weight)
+b_model_w <- lm(compound ~ Collectivism, weights = count, data = full_data)
+
+#with covariates (with weight)
+cov_model_w <- lm(compound ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data)
+
+#Pos SCORE
+
+#base model(With weight)
+b_modelpos_w <- lm(pos ~ Collectivism, weights = count, data = full_data)
+
+#with covariates (with weight)
+cov_modelpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                     weights = count, data = full_data)
+
+#Neg SCORE
+
+#base model(With weight)
+b_modelneg_w <- lm(neg ~ Collectivism, weights = count, data = full_data)
+
+#with covariates (with weight)
+cov_modelneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum,
+                     weights = count, data = full_data)
+
+##GENERAL TWEETS
+
+general_t_agg <- general_t %>%
+  #filter(politics == FALSE) %>%
+  #filter(covid == TRUE) %>% 
+  group_by(state) %>%
+  summarise(
+    compound = mean(vader_compound, na.rm = TRUE),
+    pos = mean(vader_pos, na.rm = TRUE),
+    neg = mean(vader_neg, na.rm = TRUE),
+    count = n()
+  )
+    
+
+comb_data_gen <- cov %>% 
+  left_join(general_t_agg, by = c("State" = "state"))
+
+full_data_gen <- comb_data_gen %>% 
+  left_join(case_death, by = c("State" = "state"))
+
+full_data_gen <- subset(full_data_gen, !is.na(full_data_gen$compound))
+
+full_data_gen[, c(3:22, 24, 25)] <- lapply(full_data_gen[, c(3:22, 24, 25)], scale)
+
+##COMPOUND SCORE
+
+#base model(With weight)
+b_gen_w <- lm(compound ~ Collectivism, weights = count, data = full_data_gen)
+
+#with covariates (with weight)
+cov_gen_w <- lm(compound ~ Collectivism + Population + Income + Median_age  + Conservatism + case_sum + death_sum, 
+                  weights = count, data = full_data_gen)
+
+##Pos SCORE
+
+#base model(With weight)
+b_genpos_w <- lm(pos ~ Collectivism, weights = count, data = full_data_gen)
+
+#with covariates (with weight)
+cov_genpos_w <- lm(pos ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                     weights = count, data = full_data_gen)
+
+##Neg SCORE
+
+#base model(With weight)
+b_genneg_w <- lm(neg ~ Collectivism, weights = count, data = full_data_gen)
+
+#with covariates (with weight)
+cov_genneg_w <- lm(neg ~ Collectivism + Population + Income + Median_age + Conservatism + case_sum + death_sum, 
+                     weights = count, data = full_data_gen)
+```
+
+We performed the same set of analyses for sentiment scores from NRC. Because there are eight specific emotions, and we did not have a priori predictions on which emotions were likely involved, we treated our analyses as exploratory. We fit the base model and the model with covariates on each emotion score, for both the covid-related tweets and general tweets. Because there are eight emotion categories, we corrected for multiple correction using the Bonferroni method, and set the threshold of significance to *p* < 0.0625 (0.5/8). The R codes for NRC analysis are included below:
+
+```{r covid_keyword_tweet, echo = F, warning=F, message=F}
+
+covid_t <- read_csv('NRC_raw.csv')
+
+covid_t_agg <- covid_t %>% 
+  group_by(state) %>% 
+  summarise_at(vars(fear:num_sentence), mean, na.rm = TRUE)
+
+comb_data <- covid_t_agg %>% 
+  left_join(case_death, by = "state")
+
+full_data <- cov %>% 
+  left_join(comb_data, by = c("State" = "state"))
+full_data[, c(3:29, 31:34)] <- lapply(full_data[, c(3:29, 31:34)], scale)
+
+#iterated fitting
+varlist <- names(full_data)[c(20:24, 27:29)]
+models <- lapply(varlist, function(x){
+  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + num_sentence + case_sum + death_sum, list(i = as.name(x))), 
+     weights = count, data = full_data)
+})
+
+general_t_agg <- general_t %>%
+  #filter(politics == FALSE) %>% 
+  group_by(state) %>%
+  summarise_at(vars(anger:trust, sentence_count_1), mean, na.rm = TRUE)
+
+general_t_count <- general_t %>%
+  #filter(politics == FALSE) %>% 
+  group_by(state) %>%
+  summarise(count = n())
+
+general_t_data <- left_join(general_t_agg, general_t_count, by = "state")
+    
+
+comb_data_gen <- general_t_data %>% 
+  left_join(case_death, by = "state")
+
+full_data_gen <- cov %>% 
+  left_join(comb_data_gen, by = c("State" = "state"))
+
+full_data_gen[, c(3:28, 30:31)] <- lapply(full_data_gen[, c(3:28, 30:31)], scale)
+
+models <- lapply(varlist, function(x){
+  lm(substitute(i ~ Collectivism + Population + Income + Median_age + Conservatism + sentence_count_1 + case_sum + death_sum, 
+                list(i = as.name(x))), weights = count, data = full_data_gen)
+})
+```
+
+# Results
+
+This section presents the main results.
+
+## Data exploration
+
+The results section may have a data exploration part, but in general the structure here depends on the specific project.
+
+```{r}
+# What happens here depends on the specific project
+```
+
+```{r}
+# What happens here depends on the specific project
+```
+
+## Analysis
+
+This section presents the main results, such as (for example) stats and graphs that show relationships, model results and/or clustering, PCA, etc.
+
+```{r}
+# What happens here depends on the specific project
+```
+
+```{r}
+# What happens here depends on the specific project
+```
+
+```{r}
+# What happens here depends on the specific project
+```
+
+# Discussion
+
+This section summarizes the results and may briefly outline advantages and limitations of the work presented.
+
+# References
+
+# Supplementary materials
