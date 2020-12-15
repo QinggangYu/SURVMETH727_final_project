@@ -33,11 +33,15 @@ library(readr)
 
 # Introduction
 
-21st century has been by various and nonstop pandemics: acute respiratory syndrome (SARS) in 2003, H1N1 influenza in 2009, Ebola in 2015, and since the end of 2019 till today, COVID-19. Besides imposing enormous threats to people's physical health, pandemics also cast huge influence public sentiment. Since its outbreak, COVID-19 has brought grave consequences for people's mental health and mood, regardless of age or gender[@Philip2020; @Milne2020; @Phelps2020; @Zhang2020; @Terry2020; @Kumar2020; @Pfefferbaum2020]. There is no doubt that the ongoing pandemic has and will continue bringing disturbances to the public sentiment.
+The 21st century may be an era of the infectious disease (**Quammen, 2012**). Indeed, the 21st century has been inflicted by various pandemics: acute respiratory syndrome (SARS) in 2003, H1N1 influenza in 2009, Ebola in 2015, and since the end of 2019 till today, COVID-19. Besides imposing enormous threats to people's physical health, pandemics also cast huge influence on mental health. Since its outbreak, COVID-19 has brought grave consequences for people's emotion and psychological well-being, regardless of age or gender[@Philip2020; @Milne2020; @Phelps2020; @Zhang2020; @Terry2020; @Kumar2020; @Pfefferbaum2020]. Therefore, understanding how pathogen threat (like the current pandemic) shifts people's emotional patterns or sentiments presents as a timely investigation.   
 
-However, one cannot fully understand the sentiment pattern of any group or society without understanding its cultural underpinning. One important dimension that shapes a culture is where this culture fall along the spectrum of collectivism - individualism [@Markus1991]. ............ Evolutionary perspective [@Fincher2008] ........Social psychological perspective [@Eisenberger2007; @Salvador2020]
+However, one cannot fully understand the sentiment pattern of any group or society without understanding its cultural underpinning, given the profound way culture shapes one's emotion (**cite some papers by Jeanne Tsai maybe**). One important dimension that cultures differ on is the dimension of collectivism - individualism [@Markus1991] (**also add Hofstede**). Whereas individualistic cultures emphasize freedom, personal choice, self-interest, personal achievements, and the agency and independence of the self, collectivist cultures emphasize social roles, obligations, social norms, and the importance of groups, relationships, and hierarchy.  
 
-To understand the role of collectivism in shaping emotional experiences in the U.S. during COVID-19 pandemic, we focused on analyzing sentiments on one of the most popular social media, Twitter.
+The construct of collectivism-individualism is particularly relevant to the discussion of pathogen threat because prior work has proposed that variation in historical pathogen prevalence across of the globe is the very reason that cultures differ on this dimension [@Fincher2008]. Throughout the human history, individuals, as well as social groups need to possess psychological mechanisms that serve the function of antipathogen defense in order to survive, if they live in regions with high pathogen prevalence. One effective antipathogen defense mechanism is collectivism. First, collectivists make clear distinction between ingroup and outgroup, and are more likely to show ingroup favoritism and outgroup denigration (**Gelfand et al., 2004**). They are thus more cautious when being around of outgroup, who, in human history, are more likely to carry novel pathogens (**cite the Guns Germs and Steel book**). Second, collectivist cultures have stronger social norms on individual's behaviors (**cite Gelfand, tightness looseness paper**), including many that has direct consequences on antipathogen defense (**Sherman and Billing 1999**). Therefore, it stands to reason that people from collectivist cultures should be more wary of pathogen threat, and hence showing a more negative sentiment in response to pathogen threat.  
+
+However, one may hypothesize the exact opposite. Collectivism comes with a greater range of and more interconnected relationships. Social relationships, especially close ones, are typically considered as warm and soothing (**Williams & Bargh 2008**). For instance, it has been shown that physical reactions to pain are attentuated in the presence of close others (**Coan et al., 2006**). Similarly, people who are more socially connected show reduced physiological response to physical pain [@Eisenberger2007]. Extrapolating from these findings, it is possible that when feeling embedded in social relationships, it may generate a so-called "analgesic effect", so as individuals become less sensitive and vigilant to the danger and threat in the surrounding environment. Indeed, a recent study shows that when primed with pathogen threat, individuals who are more interdependent (or collectivist) become less vigilant to norm violations [@Salvador2020]. Therefore, an alternative hypothesis is that people from collectivist cultures may in fact be less sensitive to pathogen threat, and thus exhibit a more positive (or less negative) sentiment towards the pandemic.
+
+To test these competing hypotheses, we investigate people's expression of their sentiments towards the pandemic as they naturally occur. In particular, we prospectly collected posts (or tweets) from Twitter, one of the most popular social media, and analyzed the sentiments. This method enables the collection of a large amount of data which are not limited by geographical constraint. We focused our investigation on each of the states of the USA, which has been shown to differ in the degree of collectivism. We examined whether the tweets coming from different states differ in the sentiments, as a function of the level of collectivism of each state.
 
 
 # Data
@@ -178,7 +182,7 @@ general$politics <- grepl("vote|election|reelection|Trump|Donald Trump|Biden|Joe
 
 ### State-level collectivism
 
-The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons, we winsorized it to 3 standard deviations above the mean.
+The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study [@Vandello1999]. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons (**Triandis et al. 1990**), we winsorized it to 3 standard deviations above the mean.
 
 ### Covariates
 
@@ -745,7 +749,7 @@ ggplot(data = coef_table_gen) +
 
 This study investigated how sentiment may change as a function of collectivism in the face of pathogen threat in the U.S. by analyzing sentiment in geo-mapped tweets within the U.S. during COVID-19 pandemic. We started with a pair of competing hypotheses regarding the role of collectivism in modulating people's emotion under pathogen threat, and our results suggested that both hypotheses may be true in some specific domain.
 
-According to our results from vader analyses, in general, collectivism sensitizes people's reaction to pathogen threat, hereby leading to more negative sentiment. This is consistent with the evolutionary framework laid out by Fincher and his colleagues [-@Fincher2008]. However, when narrowed down to pandemic-specific topics, collectivism actually functioned as a buffer and predicted more positive sentiment. This is consistent with the social psychological perspective where the sense of social embedding and mutual interdependence can provide analgesic effect in the face of discomfort [@@Eisenberger2007; @Salvador2020]. Our NRC results showing that collectivism predicted the decrease of fear in covid-related tweet further supported this argument.
+According to our results from vader analyses, in general, collectivism sensitizes people's reaction to pathogen threat, hereby leading to more negative sentiment. This is consistent with the evolutionary framework laid out by Fincher and his colleagues [-@Fincher2008]. However, when narrowed down to pandemic-specific topics, collectivism actually functioned as a buffer and predicted more positive sentiment. This is consistent with the social psychological perspective where the sense of social embedding and mutual interdependence can provide analgesic effect in the face of discomfort [@Eisenberger2007; @Salvador2020]. Our NRC results showing that collectivism predicted the decrease of fear in covid-related tweet further supported this argument.
 
 The rest of results from NRC analyses was less telling. In covid-related tweets, it was hard to interpret why collectivism predicted less trust  while predicting more positive sentiment at the same time. Moreover, collectivism did not predict any other specific positive sentiment. Similarly, in general tweets, collectivism failed to predict any specific negative sentiment. Putting these results together, it seems that one question awaiting for further investigations is that which specific positive and negative emotions drive people's general feeling in different domains in the time of pandemic. However, such results can also be interpreted as a limitation of the NRC analysis conducted in the present study, which we will return to later.
 
@@ -760,3 +764,50 @@ In spite of the above mentioned limitations, this study has shed new light on th
 <div id="refs"></div>
 
 # Supplementary materials
+
+Below is the full python codes for collecting covid-related tweets (using keywords in the query) while at the same time limiting the collection within the U.S. bound box.
+
+```{python, eval = FALSE, python.reticulate = FALSE}
+import tweepy
+import pandas as pd
+import time
+import os
+
+class MyStreamListener(tweepy.StreamListener):
+    
+    def __init__(self, time_limit = 600):
+        self.start_time = time.time()
+        self.limit = time_limit
+        super(MyStreamListener, self).__init__()
+    
+    def on_status(self, status):
+        if (time.time() - self.start_time) < self.limit:
+            if hasattr(status, "extended_tweet"):
+                text = status.extended_tweet["full_text"]
+            else:
+                text = status.text
+            keys = ['covid', 'corona', 'pandemic', 'epidemic', 'reopen', 'quarantine',
+                     'social distance', 'cough', 'fever', 'mask', 'virus', 'infect',
+                     'contagious', 'stayhome']
+            for term in keys:
+                if term in text.lower():
+                    out = " found"
+                    print(out)
+                    all_tweets.append(status)
+                    break
+            return True
+        else:
+            return False
+        
+        
+    def on_error(self, status_code):
+        if status_code == 420:
+            print('paused')
+            return False
+            
+all_tweets = []
+box = [-178.334698, 18.910360999999998, -66.949895, 49.384358]
+myStream = tweepy.Stream(auth = api.auth, listener = MyStreamListener(36000), 
+                         tweet_mode = 'extended')
+myStream.filter(locations = box)
+```
