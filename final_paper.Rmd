@@ -21,6 +21,7 @@ always_allow_html: yes
 
 \pagebreak
 
+
 ```{r, include = FALSE}
 library(knitr)
 library(tidyverse)
@@ -29,17 +30,18 @@ library(readxl)
 library(stargazer)
 library(ggrepel)
 library(readr)
+library(magrittr)
 ```
 
 # Introduction
 
-The 21st century may be an era of the infectious disease (**Quammen, 2012**). Indeed, the 21st century has been inflicted by various pandemics: acute respiratory syndrome (SARS) in 2003, H1N1 influenza in 2009, Ebola in 2015, and since the end of 2019 till today, COVID-19. Besides imposing enormous threats to people's physical health, pandemics also cast huge influence on mental health. Since its outbreak, COVID-19 has brought grave consequences for people's emotion and psychological well-being, regardless of age or gender[@Philip2020; @Milne2020; @Phelps2020; @Zhang2020; @Terry2020; @Kumar2020; @Pfefferbaum2020]. Therefore, understanding how pathogen threat (like the current pandemic) shifts people's emotional patterns or sentiments presents as a timely investigation.   
+The 21st century may be an era of the infectious disease [@quammen2012spillover]. Indeed, the 21st century has been inflicted by various pandemics: acute respiratory syndrome (SARS) in 2003, H1N1 influenza in 2009, Ebola in 2015, and since the end of 2019 till today, COVID-19. Besides imposing enormous threats to people's physical health, pandemics also cast huge influence on mental health. Since its outbreak, COVID-19 has brought grave consequences for people's emotion and psychological well-being, regardless of age or gender[@Philip2020; @Milne2020; @Phelps2020; @Zhang2020; @Terry2020; @Kumar2020; @Pfefferbaum2020]. Therefore, understanding how pathogen threat (like the current pandemic) shifts people's emotional patterns or sentiments presents as a timely investigation.   
 
-However, one cannot fully understand the sentiment pattern of any group or society without understanding its cultural underpinning, given the profound way culture shapes one's emotion (**cite some papers by Jeanne Tsai maybe**). One important dimension that cultures differ on is the dimension of collectivism - individualism [@Markus1991] (**also add Hofstede**). Whereas individualistic cultures emphasize freedom, personal choice, self-interest, personal achievements, and the agency and independence of the self, collectivist cultures emphasize social roles, obligations, social norms, and the importance of groups, relationships, and hierarchy.  
+However, one cannot fully understand the sentiment pattern of any group or society without understanding its cultural underpinning, given the profound way culture shapes one's emotion [@tsai2006cultural; @tsai2007ideal]. One important dimension that cultures differ on is the dimension of collectivism - individualism [@Markus1991; @hofstede1984culture]. Whereas individualistic cultures emphasize freedom, personal choice, self-interest, personal achievements, and the agency and independence of the self, collectivist cultures emphasize social roles, obligations, social norms, and the importance of groups, relationships, and hierarchy.  
 
-The construct of collectivism-individualism is particularly relevant to the discussion of pathogen threat because prior work has proposed that variation in historical pathogen prevalence across of the globe is the very reason that cultures differ on this dimension [@Fincher2008]. Throughout the human history, individuals, as well as social groups need to possess psychological mechanisms that serve the function of antipathogen defense in order to survive, if they live in regions with high pathogen prevalence. One effective antipathogen defense mechanism is collectivism. First, collectivists make clear distinction between ingroup and outgroup, and are more likely to show ingroup favoritism and outgroup denigration (**Gelfand et al., 2004**). They are thus more cautious when being around of outgroup, who, in human history, are more likely to carry novel pathogens (**cite the Guns Germs and Steel book**). Second, collectivist cultures have stronger social norms on individual's behaviors (**cite Gelfand, tightness looseness paper**), including many that has direct consequences on antipathogen defense (**Sherman and Billing 1999**). Therefore, it stands to reason that people from collectivist cultures should be more wary of pathogen threat, and hence showing a more negative sentiment in response to pathogen threat.  
+The construct of collectivism-individualism is particularly relevant to the discussion of pathogen threat because prior work has proposed that variation in historical pathogen prevalence across of the globe is the very reason that cultures differ on this dimension [@Fincher2008]. Throughout the human history, individuals, as well as social groups need to possess psychological mechanisms that serve the function of antipathogen defense in order to survive, if they live in regions with high pathogen prevalence. One effective antipathogen defense mechanism is collectivism. First, collectivists make clear distinction between ingroup and outgroup, and are more likely to show ingroup favoritism and outgroup denigration [@house2004culture]. They are thus more cautious when being around of outgroup, who, in human history, are more likely to carry novel pathogens [@diamond1999guns]. Second, collectivist cultures have stronger social norms on individual's behaviors [@gelfand2006nature], including many that has direct consequences on antipathogen defense [@sherman1999darwinian]. Therefore, it stands to reason that people from collectivist cultures should be more wary of pathogen threat, and hence showing a more negative sentiment in response to pathogen threat.  
 
-However, one may hypothesize the exact opposite. Collectivism comes with a greater range of and more interconnected relationships. Social relationships, especially close ones, are typically considered as warm and soothing (**Williams & Bargh 2008**). For instance, it has been shown that physical reactions to pain are attentuated in the presence of close others (**Coan et al., 2006**). Similarly, people who are more socially connected show reduced physiological response to physical pain [@Eisenberger2007]. Extrapolating from these findings, it is possible that when feeling embedded in social relationships, it may generate a so-called "analgesic effect", so as individuals become less sensitive and vigilant to the danger and threat in the surrounding environment. Indeed, a recent study shows that when primed with pathogen threat, individuals who are more interdependent (or collectivist) become less vigilant to norm violations [@Salvador2020]. Therefore, an alternative hypothesis is that people from collectivist cultures may in fact be less sensitive to pathogen threat, and thus exhibit a more positive (or less negative) sentiment towards the pandemic.
+However, one may hypothesize the exact opposite. Collectivism comes with a greater range of and more interconnected relationships. Social relationships, especially close ones, are typically considered as warm and soothing [@williams2008experiencing]. For instance, it has been shown that physical reactions to pain are attentuated in the presence of close others [@coan2006lending]. Similarly, people who are more socially connected show reduced physiological response to physical pain [@Eisenberger2007]. Extrapolating from these findings, it is possible that when feeling embedded in social relationships, it may generate a so-called "analgesic effect", so as individuals become less sensitive and vigilant to the danger and threat in the surrounding environment. Indeed, a recent study shows that when primed with pathogen threat, individuals who are more interdependent (or collectivist) become less vigilant to norm violations [@Salvador2020]. Therefore, an alternative hypothesis is that people from collectivist cultures may in fact be less sensitive to pathogen threat, and thus exhibit a more positive (or less negative) sentiment towards the pandemic.
 
 To test these competing hypotheses, we investigate people's expression of their sentiments towards the pandemic as they naturally occur. In particular, we prospectly collected posts (or tweets) from Twitter, one of the most popular social media, and analyzed the sentiments. This method enables the collection of a large amount of data which are not limited by geographical constraint. We focused our investigation on each of the states of the USA, which has been shown to differ in the degree of collectivism. We examined whether the tweets coming from different states differ in the sentiments, as a function of the level of collectivism of each state.
 
@@ -50,19 +52,13 @@ To test these competing hypotheses, we investigate people's expression of their 
 
 ### Twitter data
 
-The data of the present study were collected by live-streaming tweets during a three-week period from October 30th to November 19th. We targeted this period because it overlapped with the onset of the "third wave" of the COVID-19 pandemic in the U.S., when close to 2,700,000 new cases and more than 22,000 new deaths happened. All data collection was conducted within the U.S. by applying a bounding box defined by geographical coordinates of the U.S borders during tweet streaming. Further, we conducted two separate lines of collection. One collection streamed tweets containing words that are related to the COVID-19 pandemic, such as "covid", "corona", and "pandemic". The other collection streamed general tweets, which means we did not limit the collection to any specific keywords. However, politically-charged tweets were identified by using keywords such as "Trump", "Biden", "vote". Politically-charged tweets in the general tweet dataset were later dropped from analyses to avoid the confounding influence of election which happened during the time of data collection. Both keywords lists are shown below.
+The data of the present study were collected by live-streaming tweets during a three-week period from October 30th to November 19th. We targeted this period because it overlapped with the onset of the "third wave" of the COVID-19 pandemic in the U.S., when close to 2,700,000 new cases and more than 22,000 new deaths happened. All data collection was conducted within the U.S. by applying a bounding box defined by geographical coordinates of the U.S borders during tweet streaming. Further, we conducted two separate lines of collection. One collection streamed tweets containing words that are related to the COVID-19 pandemic, such as "covid", "corona", and "pandemic". The other collection streamed general tweets, which means we did not limit the collection to any specific keywords.
 
-```{r keyword lists, eval = FALSE}
+```{r covid list, eval = FALSE}
 COVID_list <- c('covid', 'corona', 'pandemic', 'epidemic',
                 'reopen', 'quarantine','social distance', 
                 'cough', 'fever', 'mask', 'virus', 'infect',
                 'contagious', 'stayhome')
-Politics_list <- c('vote', "election", "reelection", "Trump",
-                   "Donald Trump", "Biden", "Joe Biden",
-                   "democrat", "republican", "ballot", "fraud",
-                   "campaign", "liberal", "conservative", "senate",
-                   "house", "electoral", "college", "candidate",
-                   "rally", "turnout")
 ```
 
 The COVID-related tweets were collected in Python using the tweepy package, which provides wrapper functions of the Twitter API. On each day, the collection starts from between 10am and 12pm and runs for 10 hours. Due to technical issues, the collection did not run properly for two days within the three-week period, so we collected an additional day of day on November 20th. A brief demonstration of the Python codes used for the data collection is as follows. The complete version of the codes is included in the supplementary materials.
@@ -108,81 +104,22 @@ COVID_III_day2pm  <- parse_stream("COVID_III_20201031_pm.json")
 saveRDS(COVID_III_day2pm, "COVID_20201031_pm.rds")
 ```
 
-All RDS files were read in, and we created `day` and `ampm` variables to identify when the tweets were collected before combining all datasets into one. For instance:
+All RDS files were read in, time of data collection was properly labeled and a unique ID was created for each tweet before collapsed into one dataframe. To reduce the size of the dataframe, only relevant variables were kept. 
 
-```{r day&ampm, eval = FALSE}
-# day 2
-## am
-day2_am <- readRDS("COVID_20201031_am.rds")
-day2_am$day <- 2
-day2_am$ampm <- "am"
-## pm
-day2_pm <- readRDS("COVID_20201031_pm.rds")
-day2_pm$day <- 2
-day2_pm$ampm <- "pm"
-```
+Finally, because the data collection time overlapped with the U.S. president election time of 2020, we labeled and removed tweets that were politically charged by using the following keywords.
 
-To reduce the size of the dataframe, only relevant variables were kept. 
-
-```{r combine, eval = FALSE}
-library(tidyverse)
-library(magrittr)
-
-# combine all datasets into general.
-general <- rbind( day1_pm,
-                  # data collection started in the afternoon of day 1
-                  day2_am, day2_pm,
-                  day3_am, day3_pm,
-                  day4_am, day4_pm,
-                  day5_am, day5_pm,
-                  day6_am, day6_pm,
-                  day7_am, day7_pm,
-                  day8_am, day8_pm,
-                  day9_am, day9_pm,
-                  day10_am, day10_pm,
-                  day11_am, day11_pm,
-                  day12_am, day12_pm,
-                  day13_am, day13_pm,
-                  day14_am, day14_pm,
-                  day15_am, day15_pm,
-                  day16_am, 
-                  # day16_pm was missing due to improper data collection
-                  day17_am, day17_pm,
-                  day18_am, day18_pm,
-                  day19_am, day19_pm,
-                  day20_am, day20_pm,
-                  day21_am, day21_pm)
-
-# create variable ID to identify each tweet
-general$ID <- c(1:nrow(general)) 
-
-# identify data collected during 3rd wave of outbreak
-general$wave <- 3
-
-general <- general %>%
-           select(., c('ID', "text", "is_quote", "is_retweet", 
-                       "favorite_count", "retweet_count", 
-                       "quote_count", "reply_count", "place_name",
-                       "place_full_name", "place_type",
-                       "country", "bbox_coords",
-                       "day", "ampm", "wave"))
-```
-
-Finally, COVID-relevant tweets and politically-charged tweets were identified using the keywords presented above.
-
-```{r general filtering, eval = FALSE}
-general$covid <- grepl("covid|corona|pandemic|epidemic|reopen|quarantine|social distance|cough|fever|mask|virus|infect|contagious|stayhome", 
-                       general$text, 
-                       ignore.case = TRUE)
-
-general$politics <- grepl("vote|election|reelection|Trump|Donald Trump|Biden|Joe Biden|democrat|republican|ballot|fraud|campaign|liberal|conservative|senate|house|electoral|college|candidate|rally|turnout", 
-                          general$text, 
-                          ignore.case = TRUE)
+```{r politics list, eval = FALSE}
+Politics_list <- c('vote', "election", "reelection", "Trump",
+"Donald Trump", "Biden", "Joe Biden",
+"democrat", "republican", "ballot", "fraud",
+"campaign", "liberal", "conservative", "senate",
+"house", "electoral", "college", "candidate",
+"rally", "turnout")
 ```
 
 ### State-level collectivism
 
-The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study [@Vandello1999]. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high, due to a bunch of sociocultural reasons (**Triandis et al. 1990**), we winsorized it to 3 standard deviations above the mean.
+The level of collectivism for each continental states of the U.S. (plus Hawaii) was retrieved from a previous study [@Vandello1999]. The score ranges from 0 (least collectivistic) to 100 (most collectivistic). The collectivism score was calculated from eight demographic/social indicators of each state. Some sample indicators of collectivism include percentage of people living alone (reverse-coded), percentage of self-employed workers (reverse-coded), divorce to marriage ratio (reverse-coded), and percentage of households with grandchildren in them. Because the collectivism score for Hawaii is exceedingly high due to multiple sociocultural reasons [@triandis1990multimethod], we winsorized it to 3 standard deviations above the mean.
 
 ### Covariates
 
@@ -279,6 +216,9 @@ general <- filter(general, !is.na(state))
 Due to the huge volume (around 2,000,000 observations) of the general tweets dataset, we created a sub-sample with the following criteria. We first examined the number of tweets each state had for each day. For states that had more than 200 tweets on a specific day, we randomly selected 200 tweets from that day; for states that had no more than 200 tweets on a specific day, we kept all tweets from that day. This sampling process returned us a total of 178160 observations which was comparable to COVID tweets dataset, and was easier for the system to handle. 
 
 ```{r general subsample, eval = FALSE}
+library(tidyverse)
+library(magrittr)
+
 general_summary <-  general %>% 
                     group_by(day, state) %>%
                     summarise(n = n()) %>%
@@ -380,7 +320,7 @@ sentiment_loop <- function(df_list) {for (df in df_list){
   }
 ```
 
-Then, to save execution time and memory, only the `ID` and `text` variables were extracted from the `general_sample` dataset and submitted to the function.
+Then, to save execution time and memory, only the `ID` and `text` variables were extracted from the `general_sample` dataset and submitted to the function. Finally, all sentiment analysis results were combined with the original dataset.
 
 ```{r general sentiment analysis, eval = FALSE}
 general_sample_text <- general_sample %>%
@@ -398,9 +338,8 @@ sample_sentiment <- list.files(pattern = "sentiment.rds") %>%
                       map_dfr(readRDS)
 ```
 
-Finally, all sentiment analysis results were combined with the original dataset.
 
-``` {r general sentiment combine, eval = FALSE}
+``` {r general sentiment combine, include = FALSE, eval = FALSE}
 # combine
 general_sample <- general_sample %>% 
                   full_join(., sample_sentiment, by = c("ID"))
@@ -416,6 +355,34 @@ general_sample$topic <- "general"
 Before conducting the main analysis on two datasets, we computed one more covariate, number of sentences in each tweet. The specific use of this variable will be explained in the statistical analysis for NRC in the following section. The same function was applied on both sets of data, and the following codes used general tweets dataset as an example.
 
 ```{r sentence count, eval = FALSE}
+library(tokenizers)
+library(qdapRegex)
+
+# remove urls
+general_sample$text_cleaned <- rm_twitter_url(general_sample$text)
+
+# initialize columns
+## sentence_count_1: use get_sentences in sentimentr
+general_sample$sentence_count_1 <- NA
+
+n = 1
+for (n in 1:nrow(general_sample)){
+                # use get_sentences in sentimentr, after removing url
+                general_sample$sentence_count_1[n] <-
+                  get_sentences(general_sample$text_cleaned[n]) %>% 
+                  unlist() %>%
+                  length()
+}
+```
+
+```{r sentence count 2, include = FALSE, eval = FALSE}
+# We computed sentence count using two packages, tokenizers and sentimentr.
+# Here are the complete codes.
+# We only used the sentence count computed by sentimentr in the analyses, so the code for computing sentence count using sentimentr is not shown in the main text.
+# The results given by the two packages reach high agreement, r = .93.
+# Here is the complete set of codes.
+
+{r sentence count, eval = FALSE}
 library(tokenizers)
 library(qdapRegex)
 library(sentimentr)
@@ -446,7 +413,6 @@ for (n in 1:nrow(general_sample)){
 # check agreement, r = .93
 cor(general_sample$sentence_count_1, general_sample$sentence_count_2)
 ```
-
 
 
 ## Statistial analysis
@@ -627,14 +593,15 @@ models_gen <- lapply(varlist, function(x){
 
 ## VADER analysis
 
-We found that when more collectivist states tweeted about COVID-19, the sentiment of the tweets tended to be more positive (Fig. 1). This was evident in both the base model (*b* = `r b_model_w$coefficients[2]`, *p* = `r summary(b_model_w)$coefficients[2,4]`), as well as after controlling for the covariates (*b* = `r cov_model_w$coefficients[2]`, *p* = `r summary(cov_model_w)$coefficients[2,4]`). The positivity of the sentiment likely arose from their tweets containing more positive words, although this was only statisitically significant in the base model (*b* = `r b_modelpos_w$coefficients[2]`, *p* = `r summary(b_modelpos_w)$coefficients[2,4]`). Collectivism did not have any effects on the negativity score of the covid-related tweets, either in the base model or after controlling the covariates , *p*s > .05. These effects are summarized in Table 1.
+We found that when more collectivist states tweeted about COVID-19, the sentiment of the tweets tended to be more positive (Fig. 1). This was evident in both the base model (*b* = `r b_model_w$coefficients[2] %>% round(digits = 3)`, *p* = `r summary(b_model_w)$coefficients[2,4] %>% round(digits = 3)`), as well as after controlling for the covariates (*b* = `r cov_model_w$coefficients[2] %>% round(digits = 3)`, *p* = `r summary(cov_model_w)$coefficients[2,4] %>% round(digits = 3)`). The positivity of the sentiment likely arose from their tweets containing more positive words, although this was only statisitically significant in the base model (*b* = `r b_modelpos_w$coefficients[2] %>% round(digits = 3)` , *p* = `r summary(b_modelpos_w)$coefficients[2,4] %>% round(digits = 3)`). Collectivism did not have any effects on the negativity score of the covid-related tweets, either in the base model or after controlling the covariates , *p*s > .05. These effects are summarized in Table 1.
 
 ```{r Table1, echo=FALSE, warning=F, message=F, results='asis'}
 stargazer(b_model_w, cov_model_w, b_modelpos_w, cov_modelpos_w, b_modelneg_w, cov_modelneg_w,
           title = "Vader Sentiment on Covid-related tweets", dep.var.labels = c("Compound Score", "Positivity Score", "Negativity Score"),
           covariate.labels = c("Collectivism", "Population", "Income", "Median age", "Conservatism", "case number", "death number"),
           column.sep.width = "1pt",
-          omit.stat = c("ll", "aic", "bic", "f", "ser"))
+          omit.stat = c("ll", "aic", "bic", "f", "ser"),
+          header = FALSE)
 ```
 
 ```{r echo = F, warning=F, message=F}
@@ -660,14 +627,15 @@ ggplot(data = full_data, mapping = aes(x = Collectivism_adjusted, y = Compound_a
   theme(legend.title = element_text(size = 8))
 ```
 
-We observed a very different picture for the general tweets. In particular, the sentiment of the general tweets from more collectivist states are more negative (Fig. 2). This was evident in both the base model (*b* = `r b_gen_w$coefficients[2]`, *p* = `r summary(b_gen_w)$coefficients[2,4]`), as well as after controlling for the covariates (*b* = `r cov_gen_w$coefficients[2]`, *p* = `r summary(cov_gen_w)$coefficients[2,4]`). This negative sentiment was driven by tweets in collectivist states containing more negative words (*b* = `r cov_genneg_w$coefficients[2]`, *p* = `r summary(cov_genneg_w)$coefficients[2,4]`), as well as less positive words (*b* = `r cov_genpos_w$coefficients[2]`, *p* = `r summary(cov_genpos_w)$coefficients[2,4]`). This result was consistent before or after controlling the covariates (stats above depicting models including the covariates). These effects are summarized in Table 2.
+We observed a very different picture for the general tweets. In particular, the sentiment of the general tweets from more collectivist states are more negative (Fig. 2). This was evident in both the base model (*b* = `r b_gen_w$coefficients[2] %>% round(digits = 3)`, *p* < .001), as well as after controlling for the covariates (*b* = `r cov_gen_w$coefficients[2] %>% round(digits = 3)`, *p* < .001). This negative sentiment was driven by tweets in collectivist states containing more negative words (*b* = `r cov_genneg_w$coefficients[2] %>% round(digits = 3)`, *p* < .001), as well as less positive words (*b* = `r cov_genpos_w$coefficients[2] %>% round(digits = 3)`, *p* = `r summary(cov_genpos_w)$coefficients[2,4] %>% round(digits = 3)`). This result was consistent before or after controlling the covariates (stats above depicting models including the covariates). These effects are summarized in Table 2.
 
 ```{r Table2, echo=FALSE, warning=F, message=F, results='asis'}
 stargazer(b_gen_w, cov_gen_w, b_genpos_w, cov_genpos_w, b_genneg_w, cov_genneg_w,
           title = "Vader Sentiment on General tweets", dep.var.labels = c("Compound Score", "Positivity Score", "Negativity Score"),
           covariate.labels = c("Collectivism", "Population", "Income", "Median age", "Conservatism", "case number", "death number"),
           column.sep.width = "1pt",
-          omit.stat = c("ll", "aic", "bic", "f", "ser"))
+          omit.stat = c("ll", "aic", "bic", "f", "ser"),
+          header = FALSE)
 ```
 
 ```{r echo = F, warning=F, message=F}
@@ -747,17 +715,17 @@ ggplot(data = coef_table_gen) +
 
 # Discussion
 
-This study investigated how sentiment may change as a function of collectivism in the face of pathogen threat in the U.S. by analyzing sentiment in geo-mapped tweets within the U.S. during COVID-19 pandemic. We started with a pair of competing hypotheses regarding the role of collectivism in modulating people's emotion under pathogen threat, and our results suggested that both hypotheses may be true in some specific domain.
+This study investigated how sentiment may change as a function of collectivism  in the face of pathogen threat by analyzing sentiment in geo-mapped tweets within the U.S. during COVID-19 pandemic. We started with a pair of competing hypotheses regarding the role of collectivism in modulating people's emotion under pathogen threat, and our results suggested that collectivism may serve as an emotional analgesic.
 
-According to our results from vader analyses, in general, collectivism sensitizes people's reaction to pathogen threat, hereby leading to more negative sentiment. This is consistent with the evolutionary framework laid out by Fincher and his colleagues [-@Fincher2008]. However, when narrowed down to pandemic-specific topics, collectivism actually functioned as a buffer and predicted more positive sentiment. This is consistent with the social psychological perspective where the sense of social embedding and mutual interdependence can provide analgesic effect in the face of discomfort [@Eisenberger2007; @Salvador2020]. Our NRC results showing that collectivism predicted the decrease of fear in covid-related tweet further supported this argument.
+According to our results from vader analyses, though at the baseline level, collectivism predicted negative sentiment, in covid-related tweets, collectivism actually functioned as a buffer and predicted more positive sentiment. This is consistent with the social psychological perspective where the sense of social embedding and mutual interdependence can reduce people's distress in the face of various threats [@coan2006lending; @Eisenberger2007; @Salvador2020]. Our NRC results showing that collectivism predicted the decrease of fear in covid-related tweet further supported this hypothesis.
 
-The rest of results from NRC analyses was less telling. In covid-related tweets, it was hard to interpret why collectivism predicted less trust  while predicting more positive sentiment at the same time. Moreover, collectivism did not predict any other specific positive sentiment. Similarly, in general tweets, collectivism failed to predict any specific negative sentiment. Putting these results together, it seems that one question awaiting for further investigations is that which specific positive and negative emotions drive people's general feeling in different domains in the time of pandemic. However, such results can also be interpreted as a limitation of the NRC analysis conducted in the present study, which we will return to later.
+The rest of results from NRC analyses was less telling. In covid-related tweets, it was hard to interpret why collectivism predicted less trust  while predicting more positive sentiment at the same time. Moreover, collectivism did not predict any other specific positive sentiment. Similarly, in general tweets, collectivism failed to predict any specific negative sentiment. Putting these results together, it seems that one question awaiting for further investigations is that which specific positive sentiment(s) drive people's emotional experiences in the time of pandemic. However, such results can also be interpreted as a limitation of the NRC analysis conducted in the present study, which we will return to later.
 
-The present study took the advantage of web-based large-scale data to capture the moment-to-moment public sentiment during COVID-19. This method has several advantages over traditional lab-based studies. First, people's mood can be elusive and constantly changing, making self report a challenging task to subjects and an inaccurate measure to researchers. In contrast, tweets live-streamed over a long period of time can easily avoid both issues by capturing people's on-site expressions and sampling people from all over the country for multiple times. Secondly, while subjects in a lab-setting may be concerned of expressing inappropriate emotions or behaviors (e.g., emotion), people are feeling much more comfortable sharing their authentic feelings on social media such as Twitter. Thirdly, Twitter simply provided a bigger potential subject pool than most survey-based subject recruiting platforms. 
+The present study took the advantage of web-based large-scale data to capture the moment-to-moment public sentiment during COVID-19. This method has several advantages over traditional lab-based studies. First, Twitter simply provided a bigger potential subject pool than most survey-based subject recruiting platforms. Secondly, the elusive and inconstant nature of mood makes self report a challenging task for subjects and an inaccurate measure for researchers. However, people spontaneously share their emotional experience on Twitter, which provides a natural and real-time reflection of their mood. Further, the rich and voluminous data obtained from long-time tweet streaming allows researcher to have a more representative sample of people's emotional experience. Thirdly, while subjects in a lab-setting may be concerned of expressing inappropriate emotions or behaviors (e.g., emotion), people are feeling much more comfortable sharing their authentic feelings on social media such as Twitter.
 
-Finally, a few limitations must be acknowledged. First, though Twitter gave us access to a bigger group of subjects, this group cannot be considered as a representative sample of the U.S. or the world population. Twitter users tend to be more affluent and younger users who are likely to be the less affected people in the time of pandemic. Therefore, the sentiment we captured on Twitter may be an inaccurate approximate of the actual public sentiment in the U.S. in real life. Secondly, the data collection and processing processes were conducted in two software, R and Python. Though we tried our best to make all codes functionally equivalent across the two software, the small misalignment between R and Python may still have cast influence on the results of the study. Finally, NRC performed sentiment analyses on sentence level, and has been found to perform better on longer texts[@reagan2017sentiment]. However, most tweets in our sample were within 3 sentences. The limited length of tweets may have led the NRC analyses to be less accurate, which in term led to the less telling and intuitive results.
+Finally, a few limitations must be acknowledged. First, though Twitter gave us access to a bigger group of subjects, this group cannot be considered as a representative sample of the U.S. or the world population. Twitter users tend to be more affluent and younger users who are likely to be the less affected people in the time of pandemic. Therefore, the sentiment we captured on Twitter may be an inaccurate approximate of the actual public sentiment in the U.S. Secondly, the data collection and processing were conducted in two software, R and Python. Though we tried our best to produce functionally matching codes, the small misalignment between R and Python might still have cast influence on the results of the study. Finally, NRC performs sentiment analyses on sentence level, and has been found to produce more accurate results for longer texts[@reagan2017sentiment]. However, most tweets in our sample were within 3 sentences. The limited length of tweets may have led the NRC analyses to be less accurate, which in term led to the less telling and intuitive results.
 
-In spite of the above mentioned limitations, this study has shed new light on the various roles of collectivism in modulating sentiment under pathogen threat. Future studies may benefit from exploring the tole collectivism beyond the Western culture. Within the U.S., Hawaii state in the present study had clearly distinguished itself as a unique subculture from the mainstream American culture, and it is possible that collectivism functions in a different manner in Hawaiians. On a global scale, previous studies have found that social relations may not always bring the sense of warmth and comfort in East Asian cultures such as Japan [@Park2014]. Therefore, collectivism may also play a different role in these cultures.
+In spite of the above mentioned limitations, this study has shed new light on the various roles of collectivism in modulating sentiment under pathogen threat. Future studies may benefit from exploring collectivism beyond the Western culture. Within the U.S., Hawaii state in the present study had clearly distinguished itself as a unique subculture from the mainstream American culture, and it is possible that collectivism functions in a different manner in Hawaiians. On a global scale, previous studies have found that social relations may not always bring the sense of warmth and comfort in East Asian cultures such as Japan [@Park2014]. Therefore, collectivism may also play a different role in these cultures.
 
 # References
 
@@ -765,6 +733,7 @@ In spite of the above mentioned limitations, this study has shed new light on th
 
 # Supplementary materials
 
+## Covid-related tweet-streaming in python
 Below is the full python codes for collecting covid-related tweets (using keywords in the query) while at the same time limiting the collection within the U.S. bound box.
 
 ```{python, eval = FALSE, python.reticulate = FALSE}
@@ -811,3 +780,607 @@ myStream = tweepy.Stream(auth = api.auth, listener = MyStreamListener(36000),
                          tweet_mode = 'extended')
 myStream.filter(locations = box)
 ```
+
+
+## General tweet-streaming in R
+Below is the full R codes for collecting general tweets in R. The specific time of data collection on each day is shown in the comment.
+
+```{r tweet streaming, eval=FALSE}
+library(rtweet)
+
+# Day 1 - 10/30/2020, pm only
+## start from 06:30 PM, EST 10/30/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201030_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day1pm  <- parse_stream("COVID_III_20201030_pm.json")
+saveRDS(COVID_III_day1pm, "COVID_20201030_pm.rds")
+
+# Day 2 - 10/31/2020, am & pm
+## start from 11:00 AM, EST 10/31/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201031_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day2am  <- parse_stream("COVID_III_20201031_am.json")
+saveRDS(COVID_III_day2am, "COVID_20201031_am.rds")
+
+## start from 9:00 PM, EST 10/31/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201031_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day2pm  <- parse_stream("COVID_III_20201031_pm.json")
+saveRDS(COVID_III_day2pm, "COVID_20201031_pm.rds")
+
+# Day 3 - 11/01/2020, am & pm
+## start from 9:30 AM, EST 11/01/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201101_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day3am  <- parse_stream("COVID_III_20201101_am.json")
+saveRDS(COVID_III_day3am, "COVID_20201101_am.rds")
+
+## start from 9:05 PM, EST 11/01/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201101_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day3pm  <- parse_stream("COVID_III_20201101_pm.json")
+saveRDS(COVID_III_day3pm, "COVID_20201101_pm.rds")
+
+# Day 4 - 11/02/2020, am & pm
+## start from 9:00 AM, EST 11/02/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201102_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day4am  <- parse_stream("COVID_III_20201102_am.json")
+saveRDS(COVID_III_day4_am, "COVID_20201102_am.rds")
+
+# start from 11:55 PM, EST 11/02/2020, json file broken as well 
+# (originally planned for 8:00 pm, json file broken)
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201102_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day4pm  <- parse_stream("COVID_III_20201102_pm.json")
+saveRDS(COVID_III_day4pm, "COVID_20201102_am.rds")
+
+# Day 5 - 11/03/2020, am & pm
+## start from 9:30 AM, EST 11/03/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201103_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day5am  <- parse_stream("COVID_III_20201103_am.json")
+saveRDS(COVID_III_day5am, "COVID_20201103_am.rds")
+
+# start from 8:00 PM, EST 11/03/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201103_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day5pm  <- parse_stream("COVID_III_20201103_pm.json")
+saveRDS(COVID_III_day5pm, "COVID_20201103_pm.rds")
+
+# Day 6 - 11/04/2020, am & pm
+## originally start from 10:30 AM, EST 11/04/2020
+## yet, the stream broke around 11:20 AM.
+## start from 11:30 AM, EST 11/04/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201104_am.json",
+  language = "en",
+  parse = FALSE
+)
+COVID_III_day6am  <- parse_stream("COVID_III_20201104_am.json")
+
+## start from 8:08 PM, EST 11/04/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201104_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day6pm  <- parse_stream("COVID_III_20201104_pm.json")
+
+# Day 7 - 11/05/2020, am & pm
+## start from 10:30 AM, EST 11/05/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201105_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day7am  <- fromJSON(readLines("COVID_III_20201105_am.json"))
+
+## start from 7:05 PM, EST 11/05/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201105_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day7pm  <- parse_stream("COVID_III_20201105_pm.json")
+saveRDS(COVID_III_day7pm, "COVID_20201105_pm.rds")
+
+# Day 8 - 11/06/2020, am & pm
+## start from 10:00 AM, EST 11/06/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201106_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day8am  <- parse_stream("COVID_III_20201106_am.json")
+saveRDS(COVID_III_day8am, "COVID_20201106_am.rds")
+
+## start from 8:30 PM, EST 11/06/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201106_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day8pm  <- parse_stream("COVID_III_20201106_pm.json")
+saveRDS(COVID_III_day8pm, "COVID_20201106_pm.rds")
+
+# Day 9 - 11/07/2020, am & pm
+## start from 11:30 AM, EST 11/07/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201107_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day9am  <- parse_stream("COVID_III_20201107_am.json")
+saveRDS(COVID_III_day9am, "COVID_20201107_am.rds")
+
+## start from 6:10 PM, EST 11/07/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201107_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day9pm  <- parse_stream("COVID_III_20201107_pm.json")
+saveRDS(COVID_III_day9pm, "COVID_20201107_pm.rds")
+
+# Day 10 - 11/08/2020, am & pm
+## start from 10:00 AM, EST 11/08/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201108_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day10am  <- parse_stream("COVID_III_20201108_am.json")
+saveRDS(COVID_III_day10am, "COVID_20201108_am.rds")
+
+## start from 8:00 PM, EST 11/08/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201108_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day10pm  <- parse_stream("COVID_III_20201108_pm.json")
+saveRDS(COVID_III_day10pm, "COVID_20201108_pm.rds")
+
+# Day 11 - 11/09/2020, am & pm
+## start from 9:40 AM, EST 11/09/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201109_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day11am  <- parse_stream("COVID_III_20201109_am.json")
+COVID_III_day11am <- fromJSON(read_lines("COVID_III_20201109_am.json"))
+
+
+## start from 7:30 PM, EST 11/09/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201109_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day11pm  <- parse_stream("COVID_III_20201109_pm.json")
+saveRDS(COVID_III_day11pm, "COVID_20201109_pm.rds")
+
+# Day 12 - 11/10/2020, am & pm
+## start from 11:50 AM, EST 11/10/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201110_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day12am  <- parse_stream("COVID_III_20201110_am.json")
+saveRDS(COVID_III_day12am, "COVID_20201110_am.rds")
+
+
+## start from 8:00 PM, EST 11/10/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201110_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day12pm  <- parse_stream("COVID_III_20201110_pm.json")
+saveRDS(COVID_III_day12pm, "COVID_20201110_pm.rds")
+
+# Day 13 - 11/11/2020, am & pm
+## start from 10:00 AM, EST 11/11/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201111_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day13am  <- parse_stream("COVID_III_20201111_am.json")
+saveRDS(COVID_III_day13am, "COVID_20201111_am.rds")
+
+## start from 8:30 PM, EST 11/11/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201111_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day13pm  <- parse_stream("COVID_III_20201111_pm.json")
+saveRDS(COVID_III_day13pm, "COVID_20201111_pm.rds")
+
+# Day 14 - 11/12/2020, am & pm
+## start from 12:30 PM, EST 11/12/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201112_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day14am  <- parse_stream("COVID_III_20201112_am.json")
+saveRDS(COVID_III_day14am, "COVID_20201112_am.rds")
+
+
+# start from 6:30 PM, EST 11/12/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201112_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day14pm  <- parse_stream("COVID_III_20201112_pm.json")
+saveRDS(COVID_III_day14pm, "COVID_20201112_pm.rds")
+
+# Day 15 - 11/13/2020, am & pm
+## start from 9:30 AM, EST 11/13/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201113_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day15am  <- parse_stream("COVID_III_20201113_am.json")
+saveRDS(COVID_III_day15am, "COVID_20201113_am.rds")
+
+## start from 9:00 PM, EST 11/13/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201113_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day15pm  <- parse_stream("COVID_III_20201113_pm.json")
+saveRDS(COVID_III_day15pm, "COVID_20201113_pm.rds")
+
+# Day 16 - 11/14/2020, am & pm
+## start from 9:00 AM, EST 11/14/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201114_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day16am  <- parse_stream("COVID_III_20201114_am.json")
+saveRDS(COVID_III_day16am, "COVID_20201114_am.rds")
+
+# start from 9:15 PM, EST 11/14/2020  - MISSING
+# originally stored in the wrong file 20201113_pm.json
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201114_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day16pm  <- parse_stream("COVID_III_20201114_pm.json")
+saveRDS(COVID_III_day16pm, "COVID_20201114_pm.rds")
+
+# Day 17 - 11/15/2020, am & pm
+## start from 10:00 AM, EST 11/15/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201115_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day17am  <- parse_stream("COVID_III_20201115_am.json")
+saveRDS(COVID_III_day17am, "COVID_20201115_am.rds")
+
+## start from 7:00 PM, EST 11/15/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201115_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day17pm  <- parse_stream("COVID_III_20201115_pm.json")
+saveRDS(COVID_III_day17pm, "COVID_20201115_pm.rds")
+
+# Day 18 - 11/16/2020, am & pm
+## start from 11:30 AM, EST 11/16/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201116_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day18am  <- parse_stream("COVID_III_20201116_am.json")
+saveRDS(COVID_III_day18am, "COVID_20201116_am.rds")
+
+## start from 6:30 PM, EST 11/16/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201116_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day18pm  <- parse_stream("COVID_III_20201116_pm.json")
+saveRDS(COVID_III_day18pm, "COVID_20201116_pm.rds")
+
+# Day 19 - 11/17/2020, am & pm
+## start from 9:30 AM, EST 11/17/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201117_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day19am  <- parse_stream("COVID_III_20201117_am.json")
+saveRDS(COVID_III_day19am, "COVID_20201117_am.rds")
+
+
+## start from 8:30 PM, EST 11/17/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201117_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day19pm  <- parse_stream("COVID_III_20201117_pm.json")
+saveRDS(COVID_III_day19pm, "COVID_20201117_pm.rds")
+
+# Day 20 - 11/18/2020, am & pm
+## start from 11:45 AM, EST 11/18/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201118_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day20am  <- parse_stream("COVID_III_20201118_am.json")
+saveRDS(COVID_III_day20am, "COVID_20201118_am.rds")
+
+## start from 8:30 PM, EST 11/18/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201118_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day20pm  <- parse_stream("COVID_III_20201118_pm.json")
+saveRDS(COVID_III_day20pm, "COVID_20201118_pm.rds")
+
+# Day 21 - 11/19/2020, am & pm
+## start from 9:30 AM, EST 11/19/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201119_am.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day21am  <- parse_stream("COVID_III_20201119_am.json")
+saveRDS(COVID_III_day21am, "COVID_20201119_am.rds")
+
+
+# start from 6:00 PM, EST 11/18/2020
+stream_tweets(
+  lookup_coords("usa"),
+  timeout = 60*60*3,  #live streaming for 3hrs
+  file_name = "COVID_III_20201119_pm.json",
+  language = "en",
+  parse = FALSE
+)
+
+COVID_III_day21pm  <- parse_stream("COVID_III_20201119_pm.json")
+saveRDS(COVID_III_day21pm, "COVID_20201119_pm.rds")
+```
+
+Due to Internet interuption, json files for tweet streaming on 11/02 (pm), 11/04 (pm), 11/09 (am), 11/17 (pm) and 11/18 (pm) included broken tweets. The following codes (adopted from [this](https://gist.github.com/JBGruber/dee4c44e7d38d537426f57ba1e4f84ab) post on github) were used to detect and remove broken tweets so that the json files could be parsed into RDS files.
+
+```{r broken tweets, eval=FALSE}
+library(rtweet)
+library(dplyr)
+library(stringi)
+library(anytime)
+
+recover_stream <- function(path, dir = NULL, verbose = TRUE) {
+ 
+  # read file and split to tweets
+  lines <- readChar(path, file.info(path)$size, useBytes = TRUE)
+  tweets <- stringi::stri_split_fixed(lines, "\n{")[[1]]
+  tweets[-1] <- paste0("{", tweets[-1])
+  tweets <- tweets[!(tweets == "" | tweets == "{")]
+ 
+  # remove misbehaving characters
+  tweets <- gsub("\r", "", tweets, fixed = TRUE)
+  tweets <- gsub("\n", "", tweets, fixed = TRUE)
+ 
+  # write tweets to disk and try to read them in individually
+  if (is.null(dir)) {
+    dir <- paste0(tempdir(), "/tweets/")
+    dir.create(dir, showWarnings = FALSE)
+  }
+ 
+  if (verbose) {
+    pb <- progress::progress_bar$new(
+      format = "Processing tweets [:bar] :percent, :eta remaining",
+      total = length(tweets), clear = FALSE
+    )
+    pb$tick(0)
+  }
+ 
+  tweets_l <- lapply(tweets, function(t) {
+    pb$tick()
+    id <- unlist(stringi::stri_extract_first_regex(t, "(?<=id\":)\\d+(?=,)"))[1]
+    f <- paste0(dir, id, ".json")
+    writeLines(t, f, useBytes = TRUE)
+    out <- tryCatch(rtweet::parse_stream(f),
+                    error = function(e) {})
+    if ("tbl_df" %in% class(out)) {
+      return(out)
+    } else {
+      return(id)
+    }
+  })
+ 
+  # test which ones failed
+  test <- vapply(tweets_l, is.character, FUN.VALUE = logical(1L))
+  bad_files <- unlist(tweets_l[test])
+ 
+  # Let user decide what to do
+  if (length(bad_files) > 0) {
+    message("There were ", length(bad_files),
+            " tweets with problems. Should they be copied to your working directory?")
+    sel <- menu(c("no", "yes", "copy a list with status_ids"))
+    if (sel == 2) {
+      dir.create(paste0(getwd(), "/broken_tweets/"), showWarnings = FALSE)
+      file.copy(
+        from = paste0(dir, bad_files, ".json"),
+        to = paste0(getwd(), "/broken_tweets/", bad_files, ".json")
+      )
+    } else if (sel == 3) {
+      writeLines(bad_files, "broken_tweets.txt")
+    }
+  }
+ 
+  # clean up
+  unlink(dir, recursive = TRUE)
+ 
+  # return good tweets
+  return(dplyr::bind_rows(tweets_l[!test]))
+}
+```
+
+
