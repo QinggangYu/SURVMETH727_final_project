@@ -699,7 +699,9 @@ In spite of the above mentioned limitations, this study has shed new light on th
 
 # Supplementary materials
 
-## Covid-related tweet-streaming in python
+## Supplementart Python codes
+
+### Covid-related tweet-streaming
 Below is the full python codes for collecting covid-related tweets. This method enables using keywords in the query, while at the same time limiting the collection within the U.S. bound box. The collection was conducted on each day during the three-week period.
 
 ```{python, eval = FALSE, python.reticulate = FALSE}
@@ -747,8 +749,95 @@ myStream = tweepy.Stream(auth = api.auth, listener = MyStreamListener(36000),
 myStream.filter(locations = box)
 ```
 
+### Geo-mapping in Python
 
-## Fixing broken stream
+```{python, eval = FALSE, python.reticulate = FALSE}
+def sort_data(dates):
+    f_name = dates + '_covid.pkl'
+    infile = open(f_name, "rb")
+    curr_day = pickle.load(infile)
+    infile.close()
+    all_states = {}
+    #coords is a panda dataframe containing the name and coordinates of each state
+    for i in range(coords.shape[0]):
+        place = coords.loc[i, "NAME"]
+        all_states[place] = []
+    for twt in curr_day:
+        if hasattr(twt, "place") and hasattr(twt.place, "country_code") \
+        and hasattr(twt.place, "bounding_box"):
+            if (twt.place.country_code == "US") and (twt.lang == "en"):
+                loc_box = twt.place.bounding_box.coordinates[0]
+                loc = np.mean(loc_box, axis = 0)
+                coordinates = (loc[1], loc[0])
+                r = rg.search(coordinates)
+                place = r[0]['admin1']
+                all_states[place].append(twt)
+    outname = 'bystate_' + f_name
+    f = open(outname, "wb")
+    pickle.dump(all_states, f)
+    f.close()
+    return all_states
+    
+dates = ['1030', '1031', '1102', '1103', '1105', '1106', '1107', '1108', 
+          '1109', '1110', '1111', '1112', '1113', '1114', '1115', '1116',
+          '1117', '1118', '1119', '1120']
+for day in dates:
+    all_states = sort_data(day)
+    #further processing starts here
+    #See code chunk under sentiment analysis
+```
+
+### Sentiment analysis in Python
+
+```{python, eval = FALSE, python.reticulate = FALSE}
+for day in dates:
+    all_states = sort_data(day)
+    #container for vader scores
+    vader_state = {}
+    for i in all_states.keys():
+        vader_state[i] = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
+    #container for NRC scores
+    NRC_state = {}
+    for i in all_states.keys():
+        NRC_state[i] = {'fear': [], 'anger': [], 'anticipation': [], \
+                       'trust': [], 'surprise': [], 'positive': [], \
+                       'negative': [], 'sadness': [], 'disgust': [], 'joy': [], \
+                       'length': [], 'sentence': []}
+    #looping through the data                   
+    for s in all_states.keys():
+        curr_states = all_states[s]
+        if len(curr_states) > 0:
+            #fetch the text of each tweet
+            for i in range(len(curr_states)):
+                tweet = curr_states[i]
+                if hasattr(tweet, "extended_tweet"):
+                    text = tweet.extended_tweet["full_text"]
+                else:
+                    text = tweet.text
+                #Vader analysis
+                broken_sent = nltk.sent_tokenize(text)
+                sent_scores = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
+                for sentence in broken_sent:
+                    vs = analyzer.polarity_scores(sentence)
+                    for k in vs.keys():
+                        sent_scores[k].append(vs[k])
+                for k in sent_scores.keys():
+                    text_score = sum(sent_scores[k])/len(sent_scores[k])
+                    vader_state[s][k].append(text_score)
+                #NRC analysis
+                text_object = NRCLex(text)
+                text_score = text_object.affect_count
+                text_length = len(text_object.words)
+                NRC_state[s]['length'].append(text_length)
+                NRC_state[s]['sentence'].append(len(text_object.sentences))
+                for k in text_score.keys():
+                    NRC_state[s][k].append(text_score[k])
+```
+
+
+## Supplementary R codes
+
+### Fixing broken stream
 
 Due to Internet interuption, json files for tweet streaming on 11/02 (pm), 11/04 (pm), 11/09 (am), 11/17 (pm) and 11/18 (pm) included broken tweets. The following codes (adopted from [this](https://gist.github.com/JBGruber/dee4c44e7d38d537426f57ba1e4f84ab) post on github) were used to detect and remove broken tweets so that the json files could be parsed into RDS files.
 
@@ -824,89 +913,4 @@ recover_stream <- function(path, dir = NULL, verbose = TRUE) {
   # return good tweets
   return(dplyr::bind_rows(tweets_l[!test]))
 }
-```
-
-## Geo-mapping in Python
-
-```{python, eval = FALSE, python.reticulate = FALSE}
-def sort_data(dates):
-    f_name = dates + '_covid.pkl'
-    infile = open(f_name, "rb")
-    curr_day = pickle.load(infile)
-    infile.close()
-    all_states = {}
-    #coords is a panda dataframe containing the name and coordinates of each state
-    for i in range(coords.shape[0]):
-        place = coords.loc[i, "NAME"]
-        all_states[place] = []
-    for twt in curr_day:
-        if hasattr(twt, "place") and hasattr(twt.place, "country_code") \
-        and hasattr(twt.place, "bounding_box"):
-            if (twt.place.country_code == "US") and (twt.lang == "en"):
-                loc_box = twt.place.bounding_box.coordinates[0]
-                loc = np.mean(loc_box, axis = 0)
-                coordinates = (loc[1], loc[0])
-                r = rg.search(coordinates)
-                place = r[0]['admin1']
-                all_states[place].append(twt)
-    outname = 'bystate_' + f_name
-    f = open(outname, "wb")
-    pickle.dump(all_states, f)
-    f.close()
-    return all_states
-    
-dates = ['1030', '1031', '1102', '1103', '1105', '1106', '1107', '1108', 
-          '1109', '1110', '1111', '1112', '1113', '1114', '1115', '1116',
-          '1117', '1118', '1119', '1120']
-for day in dates:
-    all_states = sort_data(day)
-    #further processing starts here
-    #See code chunk under sentiment analysis
-```
-
-## Sentiment analysis in Python
-
-```{python, eval = FALSE, python.reticulate = FALSE}
-for day in dates:
-    all_states = sort_data(day)
-    #container for vader scores
-    vader_state = {}
-    for i in all_states.keys():
-        vader_state[i] = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
-    #container for NRC scores
-    NRC_state = {}
-    for i in all_states.keys():
-        NRC_state[i] = {'fear': [], 'anger': [], 'anticipation': [], \
-                       'trust': [], 'surprise': [], 'positive': [], \
-                       'negative': [], 'sadness': [], 'disgust': [], 'joy': [], \
-                       'length': [], 'sentence': []}
-    #looping through the data                   
-    for s in all_states.keys():
-        curr_states = all_states[s]
-        if len(curr_states) > 0:
-            #fetch the text of each tweet
-            for i in range(len(curr_states)):
-                tweet = curr_states[i]
-                if hasattr(tweet, "extended_tweet"):
-                    text = tweet.extended_tweet["full_text"]
-                else:
-                    text = tweet.text
-                #Vader analysis
-                broken_sent = nltk.sent_tokenize(text)
-                sent_scores = {'pos':[], 'neg':[], 'neu':[], 'compound':[]}
-                for sentence in broken_sent:
-                    vs = analyzer.polarity_scores(sentence)
-                    for k in vs.keys():
-                        sent_scores[k].append(vs[k])
-                for k in sent_scores.keys():
-                    text_score = sum(sent_scores[k])/len(sent_scores[k])
-                    vader_state[s][k].append(text_score)
-                #NRC analysis
-                text_object = NRCLex(text)
-                text_score = text_object.affect_count
-                text_length = len(text_object.words)
-                NRC_state[s]['length'].append(text_length)
-                NRC_state[s]['sentence'].append(len(text_object.sentences))
-                for k in text_score.keys():
-                    NRC_state[s][k].append(text_score[k])
 ```
